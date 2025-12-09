@@ -1,0 +1,35 @@
+version: "3.9"
+
+services:
+  api:
+    build: .
+    container_name: techhelpdesk-api
+    env_file:
+      - .env
+    environment:
+      # Override DB host to point to the compose service
+      DB_HOST: db
+      DB_PORT: 5432
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    command: [ "node", "dist/src/main.js" ]
+
+  db:
+    image: postgres:16-alpine
+    container_name: techhelpdesk-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-tech_helpdesk}
+      POSTGRES_USER: ${DB_USERNAME:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
+
+
